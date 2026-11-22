@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campo Libre · Fincas y cabañas para alquilar</title>
+  <meta name="description" content="Proyecto de ejemplo: catálogo de fincas, cabañas y glamping con filtros y reservas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#">Campo Libre</a>
+    <button class="ghost" id="favToggle" aria-pressed="false">Guardados <span id="favCount">0</span></button>
+  </header>
+
+  <section class="hero">
+    <h1>Un fin de semana largo,<br>una finca para todos.</h1>
+    <div class="search">
+      <label>Destino
+        <input type="search" id="q" placeholder="Ciudad o nombre">
+      </label>
+      <label>Huéspedes
+        <input type="number" id="guests" min="1" max="40" placeholder="¿Cuántos?">
+      </label>
+      <label>Precio máximo por noche
+        <select id="maxPrice">
+          <option value="0">Sin límite</option>
+          <option value="500000">Hasta $500.000</option>
+          <option value="1000000">Hasta $1.000.000</option>
+          <option value="1500000">Hasta $1.500.000</option>
+        </select>
+      </label>
+      <label>Ordenar por
+        <select id="sort">
+          <option value="rating">Mejor calificadas</option>
+          <option value="priceAsc">Precio: menor a mayor</option>
+          <option value="priceDesc">Precio: mayor a menor</option>
+          <option value="capacity">Mayor capacidad</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <nav class="chips" id="chips" aria-label="Categorías"></nav>
+
+  <main>
+    <p class="count" id="count" aria-live="polite"></p>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden>No hay alojamientos con esos filtros. Prueba con menos huéspedes o un precio más alto.</p>
+  </main>
+
+  <dialog id="dlg">
+    <form method="dialog" id="bookForm">
+      <h2 id="dTitle"></h2>
+      <p id="dMeta" class="muted"></p>
+      <label>Llegada <input type="date" id="in" required></label>
+      <label>Salida <input type="date" id="out" required></label>
+      <label>Huéspedes <input type="number" id="dGuests" min="1" required></label>
+      <p class="total" id="total">Elige las fechas para ver el total.</p>
+      <div class="actions">
+        <button type="button" class="ghost" id="cancel">Cancelar</button>
+        <button type="submit" id="confirm">Solicitar reserva</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+  <footer>Proyecto de ejemplo con datos ficticios. Sin relación con ninguna marca real.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
