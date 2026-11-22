@@ -12,6 +12,17 @@ const PROPERTIES = [
 const TYPES = ["Todos","Finca","Cabaña","Glamping","Villa"];
 
 const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// Propiedades publicadas por el usuario (se guardan en el navegador)
+const PALETTES = [["#3d6b4f","#8fb996"],["#0f4c5c","#5fa8b8"],["#6b4f8f","#b8a1d9"],["#b5651d","#f2a900"],["#7a3b5e","#d98cb3"],["#2f6f62","#7cc4b0"]];
+try {
+  const own = JSON.parse(localStorage.getItem("cl-own") || "[]");
+  own.forEach(p => PROPERTIES.push(p));
+} catch { /* sin almacenamiento */ }
+const saveOwn = () => {
+  try { localStorage.setItem("cl-own", JSON.stringify(PROPERTIES.filter(p => p.own))); } catch {}
+};
 const fmt = n => "$" + n.toLocaleString("es-CO");
 const state = { type:"Todos", favsOnly:false, favs:new Set(), current:null };
 
@@ -35,7 +46,7 @@ function filtered(){
     (!max || p.price <= max) &&
     (!state.favsOnly || state.favs.has(p.id)));
   const sorts = {
-    rating:(a,b)=>b.rating-a.rating,
+    rating:(a,b)=>(b.rating||0)-(a.rating||0),
     priceAsc:(a,b)=>a.price-b.price,
     priceDesc:(a,b)=>b.price-a.price,
     capacity:(a,b)=>b.guests-a.guests
@@ -52,13 +63,13 @@ function render(){
     <article class="card">
       <div class="pic" style="background:linear-gradient(135deg,${p.colors[0]},${p.colors[1]})">
         <strong>${p.type}</strong>
-        <button class="heart" data-fav="${p.id}" aria-label="Guardar ${p.name}">${state.favs.has(p.id)?"♥":"♡"}</button>
+        <button class="heart" data-fav="${p.id}" aria-label="Guardar ${esc(p.name)}">${state.favs.has(p.id)?"♥":"♡"}</button>
       </div>
       <div class="body">
-        <h3>${p.name}</h3>
-        <p class="muted">${p.city}</p>
-        <p class="muted">${p.guests} huéspedes, ${p.rooms} habitaciones, ★ ${p.rating}</p>
-        <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join("")}</div>
+        <h3>${esc(p.name)}</h3>
+        <p class="muted">${esc(p.city)}</p>
+        <p class="muted">${p.guests} huéspedes, ${p.rooms} habitaciones, ${p.rating ? "★ " + p.rating : "Nuevo"}</p>
+        <div class="tags">${p.own ? `<span class="own">Publicado por ti</span>` : ""}${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
         <div class="row">
           <span class="price">${fmt(p.price)} <small>/ noche</small></span>
           <button data-book="${p.id}">Reservar</button>
@@ -70,7 +81,30 @@ function render(){
 // Eventos
 $("chips").addEventListener("click", e => {
   const b = e.target.closest("[data-type]"); if(!b) return;
-  state.type = b.dataset.type; renderChips(); render();
+  state.type = b.dataset.type; // Publicar una finca
+$("hostBtn").addEventListener("click", () => { $("hostForm").reset(); $("hostDlg").showModal(); });
+$("hCancel").addEventListener("click", () => $("hostDlg").close());
+$("hostForm").addEventListener("submit", () => {
+  const nextId = Math.max(...PROPERTIES.map(p => p.id)) + 1;
+  PROPERTIES.push({
+    id: nextId,
+    own: true,
+    name: $("hName").value.trim(),
+    city: $("hCity").value.trim(),
+    type: $("hType").value,
+    guests: parseInt($("hGuests").value),
+    rooms: parseInt($("hRooms").value),
+    price: parseInt($("hPrice").value),
+    rating: null,
+    tags: $("hTags").value.split(",").map(t => t.trim()).filter(Boolean).slice(0, 5),
+    colors: PALETTES[nextId % PALETTES.length]
+  });
+  saveOwn();
+  render();
+  toast("Tu alojamiento fue publicado. Míralo en el catálogo.");
+});
+
+renderChips(); render();
 });
 ["q","guests","maxPrice","sort"].forEach(id => $(id).addEventListener("input", render));
 
@@ -126,5 +160,28 @@ function toast(msg){
   const t = $("toast"); t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 3200);
 }
+
+// Publicar una finca
+$("hostBtn").addEventListener("click", () => { $("hostForm").reset(); $("hostDlg").showModal(); });
+$("hCancel").addEventListener("click", () => $("hostDlg").close());
+$("hostForm").addEventListener("submit", () => {
+  const nextId = Math.max(...PROPERTIES.map(p => p.id)) + 1;
+  PROPERTIES.push({
+    id: nextId,
+    own: true,
+    name: $("hName").value.trim(),
+    city: $("hCity").value.trim(),
+    type: $("hType").value,
+    guests: parseInt($("hGuests").value),
+    rooms: parseInt($("hRooms").value),
+    price: parseInt($("hPrice").value),
+    rating: null,
+    tags: $("hTags").value.split(",").map(t => t.trim()).filter(Boolean).slice(0, 5),
+    colors: PALETTES[nextId % PALETTES.length]
+  });
+  saveOwn();
+  render();
+  toast("Tu alojamiento fue publicado. Míralo en el catálogo.");
+});
 
 renderChips(); render();
