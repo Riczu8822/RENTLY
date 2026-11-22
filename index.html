@@ -13,7 +13,10 @@
 <body>
   <header class="top">
     <a class="brand" href="#">Campo Libre</a>
-    <button class="ghost" id="favToggle" aria-pressed="false">Guardados <span id="favCount">0</span></button>
+    <div class="topbtns">
+      <button class="ghost" id="favToggle" aria-pressed="false">Guardados <span id="favCount">0</span></button>
+      <button id="hostBtn">Publicar mi finca</button>
+    </div>
   </header>
 
   <section class="hero">
@@ -63,6 +66,28 @@
       <div class="actions">
         <button type="button" class="ghost" id="cancel">Cancelar</button>
         <button type="submit" id="confirm">Solicitar reserva</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="hostDlg">
+    <form method="dialog" id="hostForm">
+      <h2>Publica tu alojamiento</h2>
+      <p class="muted">Se guarda solo en este navegador (es una demo sin servidor).</p>
+      <label>Nombre <input id="hName" required maxlength="60" placeholder="Finca La Esperanza"></label>
+      <label>Ciudad y departamento <input id="hCity" required maxlength="60" placeholder="Girardot, Cundinamarca"></label>
+      <label>Tipo
+        <select id="hType">
+          <option>Finca</option><option>Cabaña</option><option>Glamping</option><option>Villa</option>
+        </select>
+      </label>
+      <label>Huéspedes <input type="number" id="hGuests" min="1" max="60" required></label>
+      <label>Habitaciones <input type="number" id="hRooms" min="1" max="30" required></label>
+      <label>Precio por noche (COP) <input type="number" id="hPrice" min="50000" step="10000" required></label>
+      <label>Servicios (separados por coma) <input id="hTags" maxlength="80" placeholder="Piscina, BBQ, Pet friendly"></label>
+      <div class="actions">
+        <button type="button" class="ghost" id="hCancel">Cancelar</button>
+        <button type="submit">Publicar</button>
       </div>
     </form>
   </dialog>
